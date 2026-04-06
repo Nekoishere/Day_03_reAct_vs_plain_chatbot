@@ -18,6 +18,35 @@ pip install -r requirements.txt
 ### 3. Directory Structure
 - `src/tools/`: Extension point for your custom tools.
 
+## 📊 Benchmark Baseline vs ReAct (Football History)
+
+Project đã có script benchmark để so sánh metric giữa `baseline chatbot` và `ReAct agent` cho chủ đề lịch sử bóng đá.
+
+```bash
+python -m src.benchmark_football --provider openai --model gpt-4o
+```
+
+Hoặc chạy local model:
+
+```bash
+python -m src.benchmark_football --provider local --model local
+```
+
+Lưu báo cáo vào thư mục tùy chọn:
+```bash
+python -m src.benchmark_football --provider openai --model gpt-4o --output-dir report/benchmark_runs
+```
+
+Kết quả in ra gồm:
+- `avg_keyword_score` (độ chính xác theo bộ từ khóa kỳ vọng)
+- `total_tokens`, `avg_latency_ms`, `total_cost_estimate`
+- `avg_steps` của ReAct (số vòng Thought-Action-Observation)
+- Report tự động:
+  - `football_benchmark_<provider>_<timestamp>.json`
+  - `football_benchmark_<provider>_<timestamp>.md`
+
+Roadmap chi tiết: `PROJECT_ROADMAP.md`
+
 ## 🏠 Running with Local Models (CPU)
 
 If you don't want to use OpenAI or Gemini, you can run open-source models (like Phi-3) directly on your CPU using `llama-cpp-python`.
@@ -43,7 +72,7 @@ LOCAL_MODEL_PATH=./models/Phi-3-mini-4k-instruct-q4.gguf
 2.  **ReAct Loop**: Implement the `Thought-Action-Observation` cycle in `src/agent/agent.py`.
 3.  **Provider Switching**: Swap between OpenAI and Gemini seamlessly using the `LLMProvider` interface.
 4.  **Failure Analysis**: Use the structured logs in `logs/` to identify why the agent fails (hallucinations, parsing errors).
-5.  **Grading & Bonus**: Follow the [SCORING.md](file:///Users/tindt/personal/ai-thuc-chien/day03-lab-agent/SCORING.md) to maximize your points and explore bonus metrics.
+5.  **Grading & Bonus**: Follow `SCORING.md` to maximize your points and explore bonus metrics.
 
 ## 🛠️ How to Use This Baseline
 The code is designed as a **Production Prototype**. It includes:
