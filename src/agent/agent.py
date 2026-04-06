@@ -114,12 +114,16 @@ Rules:
                 if not schema:
                     return func()
 
-                # Smart split: if 2 args expected, split on last comma only
-                if len(schema) == 2 and "," in raw_args:
-                    last_comma = raw_args.rfind(",")
-                    raw_parts = [raw_args[:last_comma].strip(), raw_args[last_comma + 1:].strip()]
+                # Split from the right so multi-word first args stay intact.
+                # e.g. schema has 2 args: "Manchester United, 2025/2026"
+                #      → rsplit(",", 1) → ["Manchester United", "2025/2026"]
+                # e.g. schema has 3 args: "Manchester United, West Ham, 5/12/2025"
+                #      → rsplit(",", 2) → ["Manchester United", "West Ham", "5/12/2025"]
+                n = len(schema)
+                if n > 1 and "," in raw_args:
+                    raw_parts = [p.strip() for p in raw_args.rsplit(",", n - 1)]
                 else:
-                    raw_parts = [a.strip() for a in raw_args.split(",") if a.strip()]
+                    raw_parts = [raw_args.strip()] if raw_args.strip() else []
 
                 # Cast to int where possible
                 parsed_args = []
