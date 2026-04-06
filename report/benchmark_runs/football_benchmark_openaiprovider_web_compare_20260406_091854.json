@@ -1,0 +1,66 @@
+{
+  "generated_at": "2026-04-06T09:18:54.871729",
+  "provider": "OpenAIProvider",
+  "model": "gpt-4o",
+  "metadata": {
+    "mode": "both",
+    "run_tag": "web_compare",
+    "baseline_version": "baseline_web_v1",
+    "react_version": "react_web_v1",
+    "toolset_version": "tools_v1",
+    "dataset_version": "web_single_prompt_v1",
+    "dataset_source": "web_compare",
+    "dataset_size": 1,
+    "react_max_steps": 6
+  },
+  "baseline": {
+    "records": [
+      {
+        "question": "Tối nay có trận đấu gì nhỉ , nay là ngày bao nhiêu",
+        "answer": "Tôi không có quyền truy cập vào dữ liệu thời gian thực hoặc thông tin về các sự kiện trực tiếp, bao gồm cả lịch thi đấu bóng đá và ngày tháng hiện tại. Bạn có thể kiểm tra lịch thi đấu bóng đá tối nay trên các trang web thể thao uy tín hoặc ứng dụng thể thao trên điện thoại di động của mình để có thông tin chi tiết.",
+        "score": null,
+        "method": "baseline"
+      }
+    ],
+    "metrics": {
+      "requests": 1,
+      "total_prompt_tokens": 94,
+      "total_completion_tokens": 76,
+      "total_tokens": 170,
+      "total_latency_ms": 2206,
+      "avg_latency_ms": 2206.0,
+      "total_cost_estimate": 0.0017,
+      "avg_keyword_score": null
+    }
+  },
+  "react": {
+    "records": [
+      {
+        "question": "Tối nay có trận đấu gì nhỉ , nay là ngày bao nhiêu",
+        "answer": "Tối nay có một số trận đấu đáng chú ý diễn ra trong các giải đấu sau:\n\n**Serie A (Ý):**\n- Napoli gặp AC Milan vào lúc 2:45 PM EDT (tức 1:45 AM ngày 7/4 giờ Việt Nam).\n\n**La Liga (Tây Ban Nha):**\n- Girona gặp Villarreal vào lúc 3:00 PM EDT (tức 2:00 AM ngày 7/4 giờ Việt Nam).\n\nĐây chỉ là một số trận đấu chính, nếu bạn muốn biết thêm chi tiết về các trận đấu khác trong ngày hôm nay, bạn có thể tham khảo thông tin trên trang web bất kỳ về lịch thi đấu bóng đá.",
+        "score": null,
+        "method": "react"
+      }
+    ],
+    "metrics": {
+      "requests": 1,
+      "total_prompt_tokens": 762,
+      "total_completion_tokens": 66,
+      "total_tokens": 828,
+      "total_latency_ms": 1417,
+      "avg_latency_ms": 1417.0,
+      "total_cost_estimate": 0.00828,
+      "avg_keyword_score": null,
+      "avg_steps": 2.0
+    }
+  },
+  "comparison": {
+    "baseline_avg_keyword_score": null,
+    "react_avg_keyword_score": null,
+    "baseline_total_tokens": 170,
+    "react_total_tokens": 828,
+    "baseline_avg_latency_ms": 2206.0,
+    "react_avg_latency_ms": 1417.0,
+    "react_avg_steps": 2.0
+  }
+}
