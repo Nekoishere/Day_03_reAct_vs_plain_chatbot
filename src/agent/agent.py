@@ -132,3 +132,4 @@ class ReActAgent:
                     logger.log_event("TOOL_EXECUTION_ERROR", {"tool": tool_name, "error": str(exc)})
                     return f"Tool {tool_name} failed: {exc}"
         return f"Tool {tool_name} not found."
+addđ
