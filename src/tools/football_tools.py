@@ -143,74 +143,163 @@ FOOTBALL_TOOLS = [
         "description": "Get all currently live football match scores. No arguments needed.",
         "func": get_live_scores,
         "args_schema": [],
+        "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+        },
     },
     {
         "name": "get_league_scores",
-        "description": "Get today's scores for a specific league. Arg: league_name (e.g. Premier League, La Liga, Champions League).",
+        "description": "Get today's scores for a specific league.",
         "func": get_league_scores,
         "args_schema": ["league_name"],
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "league_name": {"type": "string", "description": "League name, e.g. Premier League, La Liga, Champions League"},
+            },
+            "required": ["league_name"],
+        },
     },
     # --- Team ---
     {
         "name": "get_team_form",
-        "description": "Get a team's last 5 results and current form streak. Arg: team_name (e.g. Arsenal).",
+        "description": "Get a team's last 5 results and current form streak.",
         "func": get_team_form,
         "args_schema": ["team_name"],
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "team_name": {"type": "string", "description": "Team name, e.g. Arsenal, Barcelona"},
+            },
+            "required": ["team_name"],
+        },
     },
     {
         "name": "get_team_season_record",
-        "description": "Get a team's season record: W/D/L and goals. Args: team_name (e.g. Manchester City), season (e.g. 2025/2026).",
+        "description": "Get a team's season record: wins, draws, losses, goals for/against.",
         "func": get_team_season_record,
         "args_schema": ["team_name", "season"],
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "team_name": {"type": "string", "description": "Team name, e.g. Manchester City"},
+                "season":    {"type": "string", "description": "Season in YYYY/YYYY format, e.g. 2025/2026"},
+            },
+            "required": ["team_name", "season"],
+        },
     },
     {
         "name": "get_head_to_head",
-        "description": "Get head-to-head history between two teams. Args: team1 (e.g. Arsenal), team2 (e.g. Chelsea).",
+        "description": "Get head-to-head history between two teams.",
         "func": get_head_to_head,
         "args_schema": ["team1", "team2"],
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "team1": {"type": "string", "description": "First team name, e.g. Arsenal"},
+                "team2": {"type": "string", "description": "Second team name, e.g. Chelsea"},
+            },
+            "required": ["team1", "team2"],
+        },
     },
     # --- Player ---
     {
         "name": "get_top_scorers",
-        "description": "Get top scorers for a league season. Args: league_name (e.g. Premier League), season (e.g. 2025/2026).",
+        "description": "Get the top scorers (golden boot race) for a league season.",
         "func": get_top_scorers,
         "args_schema": ["league_name", "season"],
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "league_name": {"type": "string", "description": "League name, e.g. Premier League"},
+                "season":      {"type": "string", "description": "Season in YYYY/YYYY format, e.g. 2025/2026"},
+            },
+            "required": ["league_name", "season"],
+        },
     },
     {
         "name": "get_player_stats",
-        "description": "Get individual stats for a player: goals, assists, minutes. Args: player_name (e.g. Mohamed Salah), season (e.g. 2025/2026).",
+        "description": "Get individual stats for a player: goals, assists, minutes played.",
         "func": get_player_stats,
         "args_schema": ["player_name", "season"],
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "player_name": {"type": "string", "description": "Player full name, e.g. Mohamed Salah"},
+                "season":      {"type": "string", "description": "Season in YYYY/YYYY format, e.g. 2025/2026"},
+            },
+            "required": ["player_name", "season"],
+        },
     },
     {
         "name": "get_injury_report",
-        "description": "Get current injury and suspension list for a team. Arg: team_name (e.g. Liverpool).",
+        "description": "Get current injury and suspension list for a team.",
         "func": get_injury_report,
         "args_schema": ["team_name"],
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "team_name": {"type": "string", "description": "Team name, e.g. Liverpool"},
+            },
+            "required": ["team_name"],
+        },
     },
     # --- Competition ---
     {
         "name": "get_league_standings",
-        "description": "Get the current league table/standings. Args: league_name (e.g. Premier League), season (e.g. 2025/2026).",
+        "description": "Get the current league table and standings.",
         "func": get_league_standings,
         "args_schema": ["league_name", "season"],
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "league_name": {"type": "string", "description": "League name, e.g. Premier League"},
+                "season":      {"type": "string", "description": "Season in YYYY/YYYY format, e.g. 2025/2026"},
+            },
+            "required": ["league_name", "season"],
+        },
     },
     {
         "name": "get_next_fixture",
-        "description": "Get the next upcoming match for a team. Arg: team_name (e.g. Liverpool).",
+        "description": "Get the next upcoming match for a team: date, opponent, competition.",
         "func": get_next_fixture,
         "args_schema": ["team_name"],
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "team_name": {"type": "string", "description": "Team name, e.g. Liverpool"},
+            },
+            "required": ["team_name"],
+        },
     },
     {
         "name": "get_match_lineup",
-        "description": "Get the latest starting lineup and formation for a team. Arg: team_name (e.g. Real Madrid).",
+        "description": "Get the latest starting lineup and formation for a team.",
         "func": get_match_lineup,
         "args_schema": ["team_name"],
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "team_name": {"type": "string", "description": "Team name, e.g. Real Madrid"},
+            },
+            "required": ["team_name"],
+        },
     },
     {
         "name": "get_match_result",
-        "description": "Get the result of a specific match between two teams on a given date. Args: team1 (e.g. Manchester United), team2 (e.g. West Ham), date (e.g. 5/12/2025).",
+        "description": "Get the result of a specific match between two teams on a given date.",
         "func": get_match_result,
         "args_schema": ["team1", "team2", "date"],
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "team1": {"type": "string", "description": "First team name, e.g. Manchester United"},
+                "team2": {"type": "string", "description": "Second team name, e.g. West Ham"},
+                "date":  {"type": "string", "description": "Match date, e.g. 5/12/2025 or December 5 2025"},
+            },
+            "required": ["team1", "team2", "date"],
+        },
     },
 ]
