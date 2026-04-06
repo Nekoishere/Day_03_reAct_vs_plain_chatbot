@@ -3,23 +3,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from src.core.openai_provider import OpenAIProvider
-from src.core.gemini_provider import GeminiProvider
-from src.chatbot.chatbot import BaselineChatbot
-from src.agent.agent import ReActAgent
-from src.tools.football_tools import FOOTBALL_TOOLS
-
-
-def build_llm():
-    provider = os.getenv("DEFAULT_PROVIDER", "openai")
-    model = os.getenv("DEFAULT_MODEL", "gpt-4o")
-
-    if provider == "openai":
-        return OpenAIProvider(model_name=model, api_key=os.getenv("OPENAI_API_KEY"))
-    elif provider == "google":
-        return GeminiProvider(model_name=model, api_key=os.getenv("GEMINI_API_KEY"))
-    else:
-        raise ValueError(f"Unknown provider: {provider}. Set DEFAULT_PROVIDER=openai or google in .env")
+from src.runtime import (
+    DEFAULT_TEST_QUERIES,
+    build_llm,
+    create_baseline_chatbot,
+    create_react_agent,
+)
 
 
 def run_interactive(mode: str):
@@ -27,7 +16,7 @@ def run_interactive(mode: str):
 
     if mode == "baseline":
         print("=== Baseline Football Chatbot (no real-time data) ===")
-        bot = BaselineChatbot(llm)
+        bot = create_baseline_chatbot(llm)
         while True:
             try:
                 user_input = input("\nYou: ").strip()
@@ -40,7 +29,7 @@ def run_interactive(mode: str):
 
     elif mode == "react":
         print("=== ReAct Football Agent (real-time web search) ===")
-        agent = ReActAgent(llm, tools=FOOTBALL_TOOLS, max_steps=6)
+        agent = create_react_agent(llm, max_steps=6)
         while True:
             try:
                 user_input = input("\nYou: ").strip()
@@ -52,7 +41,9 @@ def run_interactive(mode: str):
             print(f"\nAgent: {answer}")
 
     else:
-        raise ValueError(f"Unknown mode '{mode}'. Set MODE=baseline or MODE=react in .env")
+        raise ValueError(
+            f"Unknown mode '{mode}'. Set MODE=baseline, react, compare, or web in .env"
+        )
 
 
 def run_comparison():
@@ -60,23 +51,15 @@ def run_comparison():
     Run both modes on the same fixed queries and print side-by-side results.
     Useful for the lab report evaluation section.
     """
-    TEST_QUERIES = [
-        "What are the live football scores right now?",
-        "Who are the top 3 scorers in the Premier League this season?",
-        "What are the current Premier League standings?",
-        "Show me the recent results for Manchester United.",
-        "What is the lineup for Real Madrid today?",
-    ]
-
     llm = build_llm()
-    bot = BaselineChatbot(llm)
-    agent = ReActAgent(llm, tools=FOOTBALL_TOOLS, max_steps=6)
+    bot = create_baseline_chatbot(llm)
+    agent = create_react_agent(llm, max_steps=6)
 
     print("\n" + "=" * 70)
     print("COMPARISON: Baseline Chatbot vs ReAct Agent")
     print("=" * 70)
 
-    for i, query in enumerate(TEST_QUERIES, 1):
+    for i, query in enumerate(DEFAULT_TEST_QUERIES, 1):
         print(f"\n[Query {i}] {query}")
         print("-" * 70)
 
@@ -94,5 +77,9 @@ if __name__ == "__main__":
 
     if mode == "compare":
         run_comparison()
+    elif mode == "web":
+        from src.ui.app import run_server
+
+        run_server()
     else:
         run_interactive(mode)

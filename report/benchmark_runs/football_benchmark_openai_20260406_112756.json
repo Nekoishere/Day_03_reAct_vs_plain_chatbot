@@ -1,0 +1,79 @@
+{
+  "generated_at": "2026-04-06T11:27:56.897201",
+  "provider": "openai",
+  "model": "gpt-4o",
+  "baseline": {
+    "records": [
+      {
+        "question": "Ai vo dich World Cup 2018 va ti so chung ket la bao nhieu?",
+        "answer": "Đội tuyển Pháp vô địch World Cup 2018 và tỷ số chung kết là 4-2 trước Croatia.",
+        "score": 0.67,
+        "method": "baseline"
+      },
+      {
+        "question": "Nha vo dich Euro 2016 la ai?",
+        "answer": "Nhà vô địch Euro 2016 là đội tuyển Bồ Đào Nha.",
+        "score": 0.0,
+        "method": "baseline"
+      },
+      {
+        "question": "Real Madrid vo dich Champions League cac nam nao trong dataset?",
+        "answer": "Trong dataset của tôi, Real Madrid đã vô địch UEFA Champions League các năm: 1956, 1957, 1958, 1959, 1960, 1966, 1998, 2000, 2002, 2014, 2016, 2017, 2018 và 2022.",
+        "score": 0.67,
+        "method": "baseline"
+      }
+    ],
+    "metrics": {
+      "requests": 3,
+      "total_prompt_tokens": 143,
+      "total_completion_tokens": 118,
+      "total_tokens": 261,
+      "total_latency_ms": 4802,
+      "avg_latency_ms": 1600.67,
+      "total_cost_estimate": 0.00261,
+      "avg_keyword_score": 0.45
+    }
+  },
+  "react": {
+    "records": [
+      {
+        "question": "Ai vo dich World Cup 2018 va ti so chung ket la bao nhieu?",
+        "answer": "Đội tuyển Pháp đã vô địch World Cup 2018, đánh bại Croatia với tỷ số 4-2 trong trận chung kết.",
+        "score": 0.67,
+        "method": "react"
+      },
+      {
+        "question": "Nha vo dich Euro 2016 la ai?",
+        "answer": "The winner of Euro 2016 was Portugal. They defeated France 1-0 in the final.",
+        "score": 1.0,
+        "method": "react"
+      },
+      {
+        "question": "Real Madrid vo dich Champions League cac nam nao trong dataset?",
+        "answer": "Qua kết quả tìm kiếm trong tập dữ liệu có sẵn, Real Madrid đã vô địch Champions League hai lần.",
+        "score": 0.33,
+        "method": "react"
+      }
+    ],
+    "metrics": {
+      "requests": 6,
+      "total_prompt_tokens": 1172,
+      "total_completion_tokens": 266,
+      "total_tokens": 1438,
+      "total_latency_ms": 6447,
+      "avg_latency_ms": 1074.5,
+      "total_cost_estimate": 0.01438,
+      "avg_keyword_score": 0.67,
+      "avg_steps": 1.0
+    }
+  },
+  "comparison": {
+    "baseline_avg_keyword_score": 0.45,
+    "react_avg_keyword_score": 0.67,
+    "baseline_total_tokens": 261,
+    "react_total_tokens": 1438,
+    "baseline_avg_latency_ms": 1600.67,
+    "react_avg_latency_ms": 1074.5,
+    "react_avg_steps": 1.0
+  }
+}

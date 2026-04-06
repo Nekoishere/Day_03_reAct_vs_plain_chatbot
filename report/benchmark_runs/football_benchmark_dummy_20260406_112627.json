@@ -1,0 +1,79 @@
+{
+  "generated_at": "2026-04-06T11:26:27.899762",
+  "provider": "dummy",
+  "model": "dummy",
+  "baseline": {
+    "records": [
+      {
+        "question": "Ai vo dich World Cup 2018 va ti so chung ket la bao nhieu?",
+        "answer": "Thought: Tim du lieu\nAction: world_cup_champion_by_year(2018)",
+        "score": 0.0,
+        "method": "baseline"
+      },
+      {
+        "question": "Nha vo dich Euro 2016 la ai?",
+        "answer": "Thought: Tim du lieu\nAction: search_football_history(Euro 2016)",
+        "score": 0.0,
+        "method": "baseline"
+      },
+      {
+        "question": "Real Madrid vo dich Champions League cac nam nao trong dataset?",
+        "answer": "Thought: Tim du lieu\nAction: search_football_history(Real Madrid Champions League)",
+        "score": 0.33,
+        "method": "baseline"
+      }
+    ],
+    "metrics": {
+      "requests": 3,
+      "total_prompt_tokens": 36,
+      "total_completion_tokens": 30,
+      "total_tokens": 66,
+      "total_latency_ms": 15,
+      "avg_latency_ms": 5.0,
+      "total_cost_estimate": 0.00066,
+      "avg_keyword_score": 0.11
+    }
+  },
+  "react": {
+    "records": [
+      {
+        "question": "Ai vo dich World Cup 2018 va ti so chung ket la bao nhieu?",
+        "answer": "France vo dich World Cup 2018 voi ti so 4-2 truoc Croatia. Portugal vo dich Euro 2016. Real Madrid vo dich 2022 va 2024.",
+        "score": 1.0,
+        "method": "react"
+      },
+      {
+        "question": "Nha vo dich Euro 2016 la ai?",
+        "answer": "France vo dich World Cup 2018 voi ti so 4-2 truoc Croatia. Portugal vo dich Euro 2016. Real Madrid vo dich 2022 va 2024.",
+        "score": 1.0,
+        "method": "react"
+      },
+      {
+        "question": "Real Madrid vo dich Champions League cac nam nao trong dataset?",
+        "answer": "France vo dich World Cup 2018 voi ti so 4-2 truoc Croatia. Portugal vo dich Euro 2016. Real Madrid vo dich 2022 va 2024.",
+        "score": 1.0,
+        "method": "react"
+      }
+    ],
+    "metrics": {
+      "requests": 6,
+      "total_prompt_tokens": 72,
+      "total_completion_tokens": 60,
+      "total_tokens": 132,
+      "total_latency_ms": 30,
+      "avg_latency_ms": 5.0,
+      "total_cost_estimate": 0.00132,
+      "avg_keyword_score": 1.0,
+      "avg_steps": 1.0
+    }
+  },
+  "comparison": {
+    "baseline_avg_keyword_score": 0.11,
+    "react_avg_keyword_score": 1.0,
+    "baseline_total_tokens": 66,
+    "react_total_tokens": 132,
+    "baseline_avg_latency_ms": 5.0,
+    "react_avg_latency_ms": 5.0,
+    "react_avg_steps": 1.0
+  }
+}

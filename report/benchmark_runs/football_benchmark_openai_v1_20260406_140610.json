@@ -1,0 +1,104 @@
+{
+  "generated_at": "2026-04-06T14:06:10.163118",
+  "provider": "openai",
+  "model": "gpt-4o",
+  "metadata": {
+    "mode": "both",
+    "run_tag": "v1",
+    "baseline_version": "baseline_v1",
+    "react_version": "react_v1",
+    "toolset_version": "tools_v1",
+    "dataset_version": "dataset_v1",
+    "dataset_source": "ui_input",
+    "dataset_size": 4,
+    "react_max_steps": 5
+  },
+  "baseline": {
+    "records": [
+      {
+        "question": "Nhập",
+        "answer": "Xin chào! Bạn cần hỗ trợ về điều gì liên quan đến lịch sử bóng đá?",
+        "score": 0.0,
+        "method": "baseline"
+      },
+      {
+        "question": "d",
+        "answer": "Xin lỗi, bạn cần thêm thông tin chi tiết để tôi có thể giúp đỡ bạn.",
+        "score": 0.0,
+        "method": "baseline"
+      },
+      {
+        "question": "d",
+        "answer": "Xin lỗi, yêu cầu của bạn không rõ ràng. Bạn có thể cung cấp thêm thông tin hoặc câu hỏi chi tiết?",
+        "score": 0.0,
+        "method": "baseline"
+      },
+      {
+        "question": "đ",
+        "answer": "Xin chào! Bạn có thắc mắc cụ thể nào về lịch sử bóng đá không?",
+        "score": null,
+        "method": "baseline"
+      }
+    ],
+    "metrics": {
+      "requests": 4,
+      "total_prompt_tokens": 141,
+      "total_completion_tokens": 83,
+      "total_tokens": 224,
+      "total_latency_ms": 6228,
+      "avg_latency_ms": 1557.0,
+      "total_cost_estimate": 0.00224,
+      "avg_keyword_score": 0.0,
+      "scored_questions": 3
+    }
+  },
+  "react": {
+    "records": [
+      {
+        "question": "Nhập",
+        "answer": "Xin chào! Tôi có thể giúp gì cho bạn hôm nay?",
+        "score": 0.0,
+        "method": "react"
+      },
+      {
+        "question": "d",
+        "answer": "It seems like your question was cut off. Could you please provide more details or clarify what you need help with?",
+        "score": 1.0,
+        "method": "react"
+      },
+      {
+        "question": "d",
+        "answer": "It seems like your input was incomplete. Could you please provide more information or clarify your request?",
+        "score": 1.0,
+        "method": "react"
+      },
+      {
+        "question": "đ",
+        "answer": "It seems like your message wasn't complete or may have been a mistake. Could you please provide more information or clarify your request?",
+        "score": null,
+        "method": "react"
+      }
+    ],
+    "metrics": {
+      "requests": 4,
+      "total_prompt_tokens": 585,
+      "total_completion_tokens": 81,
+      "total_tokens": 666,
+      "total_latency_ms": 4791,
+      "avg_latency_ms": 1197.75,
+      "total_cost_estimate": 0.00666,
+      "avg_keyword_score": 0.67,
+      "scored_questions": 3,
+      "avg_steps": 0.0
+    }
+  },
+  "comparison": {
+    "baseline_avg_keyword_score": 0.0,
+    "react_avg_keyword_score": 0.67,
+    "baseline_total_tokens": 224,
+    "react_total_tokens": 666,
+    "baseline_avg_latency_ms": 1557.0,
+    "react_avg_latency_ms": 1197.75,
+    "react_avg_steps": 0.0
+  }
+}

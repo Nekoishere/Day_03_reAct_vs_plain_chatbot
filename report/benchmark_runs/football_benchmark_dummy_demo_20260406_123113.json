@@ -1,0 +1,80 @@
+{
+  "generated_at": "2026-04-06T12:31:13.897150",
+  "provider": "dummy",
+  "model": "dummy",
+  "metadata": {
+    "mode": "both",
+    "run_tag": "demo",
+    "baseline_version": "b1",
+    "react_version": "r1",
+    "toolset_version": "t1",
+    "dataset_version": "u1",
+    "dataset_source": "cli_question",
+    "dataset_size": 2,
+    "react_max_steps": 3
+  },
+  "baseline": {
+    "records": [
+      {
+        "question": "Ai vo dich World Cup 2018?",
+        "answer": "Thought: check\nAction: world_cup_champion_by_year(2018)",
+        "score": null,
+        "method": "baseline"
+      },
+      {
+        "question": "Nha vo dich Euro 2016 la ai?",
+        "answer": "Portugal won Euro 2016.",
+        "score": null,
+        "method": "baseline"
+      }
+    ],
+    "metrics": {
+      "requests": 2,
+      "total_prompt_tokens": 16,
+      "total_completion_tokens": 12,
+      "total_tokens": 28,
+      "total_latency_ms": 4,
+      "avg_latency_ms": 2.0,
+      "total_cost_estimate": 0.00028,
+      "avg_keyword_score": 0.0,
+      "scored_questions": 0
+    }
+  },
+  "react": {
+    "records": [
+      {
+        "question": "Ai vo dich World Cup 2018?",
+        "answer": "France won 2018 World Cup 4-2 Croatia.",
+        "score": null,
+        "method": "react"
+      },
+      {
+        "question": "Nha vo dich Euro 2016 la ai?",
+        "answer": "Portugal won Euro 2016.",
+        "score": null,
+        "method": "react"
+      }
+    ],
+    "metrics": {
+      "requests": 3,
+      "total_prompt_tokens": 24,
+      "total_completion_tokens": 18,
+      "total_tokens": 42,
+      "total_latency_ms": 6,
+      "avg_latency_ms": 2.0,
+      "total_cost_estimate": 0.00042,
+      "avg_keyword_score": 0.0,
+      "scored_questions": 0,
+      "avg_steps": 0.5
+    }
+  },
+  "comparison": {
+    "baseline_avg_keyword_score": 0.0,
+    "react_avg_keyword_score": 0.0,
+    "baseline_total_tokens": 28,
+    "react_total_tokens": 42,
+    "baseline_avg_latency_ms": 2.0,
+    "react_avg_latency_ms": 2.0,
+    "react_avg_steps": 0.5
+  }
+}

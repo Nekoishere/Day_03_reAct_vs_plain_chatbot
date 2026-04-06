@@ -18,24 +18,40 @@ pip install -r requirements.txt
 ### 3. Directory Structure
 - `src/tools/`: Extension point for your custom tools.
 
-## 🏠 Running with Local Models (CPU)
+## 🔌 Running with API Providers
 
-If you don't want to use OpenAI or Gemini, you can run open-source models (like Phi-3) directly on your CPU using `llama-cpp-python`.
+This project is configured for hosted API models only.
 
-### 1. Download the Model
-Download the **Phi-3-mini-4k-instruct-q4.gguf** (approx 2.2GB) from Hugging Face:
-- [Phi-3-mini-4k-instruct-GGUF](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf)
-- Direct Download: [phi-3-mini-4k-instruct-q4.gguf](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf)
-
-### 2. Place Model in Project
-Create a `models/` folder in the root and move the downloaded `.gguf` file there.
-
-### 3. Update `.env`
-Change your `DEFAULT_PROVIDER` and set the path:
+### OpenAI
 ```env
-DEFAULT_PROVIDER=local
-LOCAL_MODEL_PATH=./models/Phi-3-mini-4k-instruct-q4.gguf
+OPENAI_API_KEY=your_openai_api_key_here
+DEFAULT_PROVIDER=openai
+DEFAULT_MODEL=gpt-4o
 ```
+
+### Gemini
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+DEFAULT_PROVIDER=google
+DEFAULT_MODEL=gemini-1.5-flash
+```
+
+## 🖥️ Running Modes
+
+### CLI
+```bash
+python main.py
+MODE=baseline python main.py
+MODE=react python main.py
+MODE=compare python main.py
+```
+
+### Web UI
+```bash
+MODE=web python main.py
+```
+
+Then open `http://127.0.0.1:8000` in your browser.
 
 ## 🎯 Lab Objectives
 
