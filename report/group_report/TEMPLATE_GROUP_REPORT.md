@@ -1,8 +1,8 @@
 # Group Report: Lab 3 - Production-Grade Agentic System
 
-- **Team Name**: [Name]
-- **Team Members**: [Member 1, Member 2, ...]
-- **Deployment Date**: [YYYY-MM-DD]
+- **Team Name**: [GROUP 15 E402]
+- **Team Members**: [2A202600141 Nguyễn Công Nhật Tân, 2A202600465-Đồng Mạnh Hùng, 2A202600421-Phan Anh Ly Ly, 2A202600300-Trần Nhật Minh, 2A202600279 - Phan Nguyễn Việt Nhân]
+- **Deployment Date**: [06/04/2026]
 
 ---
 
@@ -23,12 +23,14 @@
 ### 2.2 Tool Definitions (Inventory)
 | Tool Name | Input Format | Use Case |
 | :--- | :--- | :--- |
-| `calc_tax` | `json` | Calculate VAT based on country code. |
-| `search_api` | `string` | Retrieve real-time information from Google Search. |
+| `get_live_scores` | `none` | Lấy tỉ số bóng đá trực tiếp của tất cả các giải đấu hiện tại. |
+| `get_league_standings`| `string, string` | Lấy bảng xếp hạng của một giải đấu cụ thể trong mùa giải chỉ định. |
+| `get_team_results` | `string` | Lấy kết quả 5 trận đấu gần nhất của một đội bóng. |
+| `get_match_lineup` | `string` | Lấy đội hình ra sân mới nhất hoặc dự kiến của một đội. |
 
 ### 2.3 LLM Providers Used
-- **Primary**: [e.g., GPT-4o]
-- **Secondary (Backup)**: [e.g., Gemini 1.5 Flash]
+- **Primary**: GPT-4o-mini  
+- **Secondary (Backup)**: Gemini 1.5 Flash (Auto-Fallback khi OpenAI Rate Limited)
 
 ---
 
@@ -36,10 +38,10 @@
 
 *Analyze the industry metrics collected during the final test run.*
 
-- **Average Latency (P50)**: [e.g., 1200ms]
-- **Max Latency (P99)**: [e.g., 4500ms]
-- **Average Tokens per Task**: [e.g., 350 tokens]
-- **Total Cost of Test Suite**: [e.g., $0.05]
+- **Average Latency (P50)**: 1942ms
+- **Max Latency (P99)**: 7031ms
+- **Average Tokens per Task**: 2715 tokens
+- **Total Cost of Test Suite**: $0.0073
 
 ---
 
@@ -72,9 +74,9 @@
 
 *Considerations for taking this system to a real-world environment.*
 
-- **Security**: [e.g., Input sanitization for tool arguments.]
-- **Guardrails**: [e.g., Max 5 loops to prevent infinite billing cost.]
-- **Scaling**: [e.g., Transition to LangGraph for more complex branching.]
+- **Security**: Hệ thống có `try...except` bao bọc RateLimit API, xử lý TypeError của Action parse string - chống sập Server.
+- **Guardrails**: Bị giới hạn Max `6` vòng loop ngăn Infinite Billing. 
+- **Scaling**: Triển khai FastAPI với cơ chế Asynchronous ThreadPool (`def endpoint` thay vì `async def`) phân tán gánh nặng I/O Block giúp Server chạy mượt mà ngay cả khi LLM gọi WebSearch chậm.
 
 ---
 
