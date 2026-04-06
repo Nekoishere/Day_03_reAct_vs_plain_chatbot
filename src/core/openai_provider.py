@@ -1,5 +1,7 @@
 import time
+import os
 from typing import Dict, Any, Optional, Generator
+import openai
 from openai import OpenAI
 from src.core.llm_provider import LLMProvider
 
@@ -16,10 +18,20 @@ class OpenAIProvider(LLMProvider):
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
 
-        response = self.client.chat.completions.create(
-            model=self.model_name,
-            messages=messages,
-        )
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=messages,
+            )
+        except openai.RateLimitError as e:
+            from src.core.gemini_provider import GeminiProvider
+            gemini_key = os.getenv("GEMINI_API_KEY")
+            if gemini_key:
+                print(f"[OpenAIProvider] RateLimitError! Falling back to GeminiProvider...")
+                gemini = GeminiProvider(api_key=gemini_key)
+                return gemini.generate(prompt, system_prompt)
+            else:
+                raise RuntimeError("OpenAI rate limited and no GEMINI_API_KEY available for fallback.") from e
 
         end_time = time.time()
         latency_ms = int((end_time - start_time) * 1000)
@@ -45,12 +57,22 @@ class OpenAIProvider(LLMProvider):
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
 
-        stream = self.client.chat.completions.create(
-            model=self.model_name,
-            messages=messages,
-            stream=True
-        )
+        try:
+            stream = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=messages,
+                stream=True
+            )
 
-        for chunk in stream:
-            if chunk.choices[0].delta.content:
-                yield chunk.choices[0].delta.content
+            for chunk in stream:
+                if chunk.choices[0].delta.content:
+                    yield chunk.choices[0].delta.content
+        except openai.RateLimitError as e:
+            from src.core.gemini_provider import GeminiProvider
+            gemini_key = os.getenv("GEMINI_API_KEY")
+            if gemini_key:
+                print(f"[OpenAIProvider] RateLimitError! Falling back to GeminiProvider (stream)...")
+                gemini = GeminiProvider(api_key=gemini_key)
+                yield from gemini.stream(prompt, system_prompt)
+            else:
+                raise RuntimeError("OpenAI rate limited and no GEMINI_API_KEY available for fallback.") from e
