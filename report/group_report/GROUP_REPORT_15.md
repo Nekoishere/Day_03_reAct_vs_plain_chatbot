@@ -1,7 +1,7 @@
 # Group Report: Lab 3 - Production-Grade Agentic System
 
-- **Team Name**: [Name]
-- **Team Members**: [Member 1], [Member 2]
+- **Team Name**: GROUP 15 E402
+- **Team Members**: 2A202600141-Nguyễn Công Nhật Tân, 2A202600465-Đồng Mạnh Hùng, 2A202600421-Phan Anh Ly Ly, 2A202600300-Trần Nhật Minh, 2A202600279-Phan Nguyễn Việt Nhân
 - **Deployment Date**: 2026-04-06
 
 ---
@@ -25,17 +25,18 @@ Each step is logged and exposed to the UI as `reasoning_trace` for transparency 
 ### 2.2 Tool Definitions (Inventory)
 | Tool Name | Input Format | Use Case |
 | :--- | :--- | :--- |
-| `get_live_scores` | `none` or `string` (league filter) | Retrieve live match scores. |
-| `get_league_standings` | `league, season` | Get current league table. |
-| `get_top_scorers` | `league, season` | Retrieve top scorers for a league season. |
-| `get_team_recent_results` | `team_name` | Get recent match results of a team. |
-| `get_player_stats` | `player_name, season` | Get player seasonal statistics. |
-| `get_team_injuries` | `team_name` | Retrieve current injury updates. |
-| `get_head_to_head` | `team_a, team_b` | Compare historical H2H records. |
+| `get_live_scores` | `none` | Lấy tỉ số bóng đá trực tiếp của tất cả các giải đấu hiện tại. |
+| `get_league_standings` | `league_name, season` | Lấy bảng xếp hạng của một giải đấu cụ thể trong mùa giải chỉ định. |
+| `get_top_scorers` | `league_name, season` | Lấy danh sách vua phá lưới theo giải đấu và mùa giải. |
+| `get_team_form` | `team_name` | Lấy phong độ 5 trận gần nhất của đội bóng. |
+| `get_player_stats` | `player_name, season` | Lấy thống kê cầu thủ theo mùa giải. |
+| `get_injury_report` | `team_name` | Lấy thông tin chấn thương/cầu thủ vắng mặt mới nhất. |
+| `get_head_to_head` | `team1, team2` | So sánh lịch sử đối đầu giữa hai đội. |
+| `get_match_lineup` | `team_name` | Lấy đội hình ra sân mới nhất hoặc dự kiến của một đội. |
 
 ### 2.3 LLM Providers Used
 - **Primary**: GPT-4o-mini (OpenAI)
-- **Secondary (Backup)**: Gemini (Google)
+- **Secondary (Backup)**: Gemini 1.5 Flash (fallback when needed)
 
 ---
 
@@ -43,10 +44,10 @@ Each step is logged and exposed to the UI as `reasoning_trace` for transparency 
 
 Analyze the industry metrics collected during the final test run.
 
-- **Average Latency (P50)**: 1,280ms
-- **Max Latency (P99)**: 4,350ms
-- **Average Tokens per Task**: 342 tokens
-- **Total Cost of Test Suite**: $0.06
+- **Average Latency (P50)**: 1942ms
+- **Max Latency (P99)**: 7031ms
+- **Average Tokens per Task**: 2715 tokens
+- **Total Cost of Test Suite**: $0.0073
 
 ### 3.1 Final Test Suite (5 Required Cases)
 | Case ID | Test Purpose | Input | Expected Chatbot Behavior | Expected Agent Behavior | Pass Criteria |
@@ -106,10 +107,8 @@ Therefore, "winner" for live-data tasks should be interpreted as capability diff
 Considerations for taking this system to a real-world environment.
 
 - **Security**: Enforce strict input validation/sanitization for tool arguments and API payloads; rate-limit external tool calls.
-- **Guardrails**: Keep bounded reasoning loops (`max_steps=6`), reject malformed actions, and fail safely when parsing errors occur.
-- **Scaling**: Add caching for repeated tool results, async job queue for slow tools, and structured orchestration for complex branching.
+- **Guardrails**: Keep bounded reasoning loops (`max_steps=6`) to prevent infinite cost and fail safely on malformed actions.
+- **Scaling**: Add caching for repeated tool results and async queue execution for slow tool calls to improve concurrency.
 
 ---
 
-> [!NOTE]
-> Final submission file created as `GROUP_REPORT_LY_LY.md` in this folder.
