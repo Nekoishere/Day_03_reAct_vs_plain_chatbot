@@ -1,141 +1,123 @@
-import re
+import json
 from datetime import date
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from src.core.llm_provider import LLMProvider
 from src.telemetry.logger import logger
 
 
 class ReActAgent:
     """
-    A ReAct-style Agent that follows the Thought-Action-Observation loop.
-    Tools internally use OpenAI web search to fetch real-time football data.
+    ReAct-style agent using OpenAI function calling.
+    No regex parsing — the model returns structured tool_calls objects.
     """
 
     def __init__(self, llm: LLMProvider, tools: List[Dict[str, Any]], max_steps: int = 6):
         self.llm = llm
         self.tools = tools
         self.max_steps = max_steps
+        # Pre-build the OpenAI tools schema once
+        self._openai_tools = [
+            {
+                "type": "function",
+                "function": {
+                    "name": t["name"],
+                    "description": t["description"],
+                    "parameters": t["parameters"],
+                },
+            }
+            for t in tools
+        ]
+        # Build a lookup map for fast tool execution
+        self._tool_map = {t["name"]: t["func"] for t in tools}
 
-    def get_system_prompt(self) -> str:
-        tool_descriptions = "\n".join(
-            [f"- {t['name']}: {t['description']}" for t in self.tools]
-        )
+    def _get_system_prompt(self) -> str:
         today = date.today()
         season_start = today.year if today.month >= 8 else today.year - 1
         current_season = f"{season_start}/{season_start + 1}"
-
-        return f"""You are a football assistant agent with access to real-time data tools.
-Today's date: {today.isoformat()}. The current football season is {current_season}.
-When a tool requires a season argument, always use the format YYYY/YYYY (e.g. {current_season}) unless the user specifies otherwise.
-
-Available tools:
-{tool_descriptions}
-
-You MUST follow this strict format for every step:
-
-Thought: <your reasoning about what to do next>
-Action: <tool_name>(<arg1>, <arg2>, ...)
-
-Then STOP. Do NOT write Observation yourself — it will be filled in automatically.
-After receiving an Observation, continue with another Thought/Action or end with:
-
-Final Answer: <your complete answer to the user>
-
-Rules:
-- Only use tools listed above.
-- Write argument values directly — no quotes, no variable names.
-- Never write Observation: yourself.
-- Only write Final Answer after you have received real Observation data.
-- Never combine Action and Final Answer in the same response.
-"""
+        return (
+            f"You are a football assistant with access to real-time data tools.\n"
+            f"Today's date: {today.isoformat()}. Current season: {current_season}.\n"
+            f"Use tools to fetch real data. Only answer from tool results, never guess."
+        )
 
     def run(self, user_input: str) -> str:
         logger.log_event("AGENT_START", {"input": user_input, "model": self.llm.model_name})
 
-        scratchpad = f"Question: {user_input}\n"
+        messages = [
+            {"role": "system", "content": self._get_system_prompt()},
+            {"role": "user",   "content": user_input},
+        ]
+
+        total_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
         steps = 0
 
         while steps < self.max_steps:
-            # 1. Generate next Thought + Action (or Final Answer)
-            result = self.llm.generate(scratchpad, system_prompt=self.get_system_prompt())
-            llm_output = result["content"].strip()
+            # --- Call LLM with tools ---
+            result = self.llm.generate(
+                prompt="",           # ignored when messages is provided
+                messages=messages,
+                tools=self._openai_tools,
+            )
 
+            # Accumulate token usage
+            for k in total_usage:
+                total_usage[k] += result["usage"].get(k, 0)
+
+            tool_calls = result.get("tool_calls")
+            content    = result.get("content")
+
+            # --- No tool calls → final answer ---
+            if not tool_calls:
+                logger.log_event("AGENT_END", {
+                    "steps": steps + 1,
+                    "answer": content,
+                    "total_usage": total_usage,
+                })
+                return content or "No answer returned."
+
+            # --- Tool calls → execute each, append results ---
             logger.log_event("AGENT_STEP", {
                 "step": steps + 1,
-                "llm_output": llm_output,
+                "tool_calls": [tc.function.name for tc in tool_calls],
                 "usage": result["usage"],
                 "latency_ms": result["latency_ms"],
             })
 
-            # 2. Check for Action first (takes priority)
-            action_match = re.search(r"Action:\s*(\w+)\(([^)]*)\)", llm_output)
+            # Append the assistant message (contains tool_calls)
+            messages.append(result["message"])
 
-            if not action_match:
-                # No Action — look for Final Answer
-                if "Final Answer:" in llm_output:
-                    final = llm_output.split("Final Answer:")[-1].strip()
-                    logger.log_event("AGENT_END", {"steps": steps + 1, "answer": final})
-                    return final
-                # Neither — prompt correction
-                scratchpad += llm_output + "\nObservation: No valid Action found. Follow the format strictly.\n"
-                steps += 1
-                continue
+            for tc in tool_calls:
+                tool_name = tc.function.name
+                try:
+                    kwargs = json.loads(tc.function.arguments)
+                except json.JSONDecodeError:
+                    kwargs = {}
 
-            tool_name = action_match.group(1).strip()
-            raw_args = action_match.group(2).strip()
+                observation = self._execute_tool(tool_name, kwargs)
 
-            # 3. Execute tool
-            observation = self._execute_tool(tool_name, raw_args)
+                logger.log_event("TOOL_CALL", {
+                    "tool": tool_name,
+                    "args": kwargs,
+                    "observation": observation[:300],
+                })
 
-            logger.log_event("TOOL_CALL", {
-                "tool": tool_name,
-                "args": raw_args,
-                "observation": observation[:300],  # truncate for log
-            })
+                # Append tool result message
+                messages.append({
+                    "role":         "tool",
+                    "tool_call_id": tc.id,
+                    "content":      observation,
+                })
 
-            # 4. Append observation to scratchpad and continue
-            scratchpad += llm_output + f"\nObservation: {observation}\n"
             steps += 1
 
         logger.log_event("AGENT_END", {"steps": steps, "reason": "max_steps_reached"})
         return "I ran out of steps to answer your question. Please try rephrasing."
 
-    def _execute_tool(self, tool_name: str, raw_args: str) -> str:
-        """
-        Find the tool, parse arguments, and call it.
-        Splits on the last comma when schema has 2 args to handle
-        multi-word first args like 'Premier League, 2025'.
-        """
-        for tool in self.tools:
-            if tool["name"] == tool_name:
-                func = tool["func"]
-                schema = tool.get("args_schema", [])
-
-                if not schema:
-                    return func()
-
-                # Split from the right so multi-word first args stay intact.
-                # e.g. schema has 2 args: "Manchester United, 2025/2026"
-                #      → rsplit(",", 1) → ["Manchester United", "2025/2026"]
-                # e.g. schema has 3 args: "Manchester United, West Ham, 5/12/2025"
-                #      → rsplit(",", 2) → ["Manchester United", "West Ham", "5/12/2025"]
-                n = len(schema)
-                if n > 1 and "," in raw_args:
-                    raw_parts = [p.strip() for p in raw_args.rsplit(",", n - 1)]
-                else:
-                    raw_parts = [raw_args.strip()] if raw_args.strip() else []
-
-                # Cast to int where possible
-                parsed_args = []
-                for part in raw_parts:
-                    try:
-                        parsed_args.append(int(part))
-                    except ValueError:
-                        parsed_args.append(part)
-
-                try:
-                    return func(*parsed_args)
-                except TypeError as e:
-                    return f"Argument error calling {tool_name}: {e}"
-
-        return f"Tool '{tool_name}' not found. Available: {[t['name'] for t in self.tools]}"
+    def _execute_tool(self, tool_name: str, kwargs: Dict[str, Any]) -> str:
+        func = self._tool_map.get(tool_name)
+        if func is None:
+            return f"Tool '{tool_name}' not found. Available: {list(self._tool_map.keys())}"
+        try:
+            return func(**kwargs)
+        except TypeError as e:
+            return f"Argument error calling {tool_name}: {e}"
