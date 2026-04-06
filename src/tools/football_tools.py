@@ -14,7 +14,7 @@ def _web_search(query: str) -> str:
     """Use OpenAI web_search_preview to fetch real-time football data."""
     try:
         response = _get_client().responses.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             tools=[{"type": "web_search_preview"}],
             input=query,
         )
