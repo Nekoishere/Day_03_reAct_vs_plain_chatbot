@@ -1,56 +1,92 @@
-# Lab 3: Chatbot vs ReAct Agent (Industry Edition)
+# Lab 3: Chatbot vs ReAct Agent
 
-Welcome to Phase 3 of the Agentic AI course! This lab focuses on moving from a simple LLM Chatbot to a sophisticated **ReAct Agent** with industry-standard monitoring.
+A football statistics assistant comparing a plain LLM chatbot against a ReAct agent with real-time tool access.
 
-## 🚀 Getting Started
+## Setup
 
-### 1. Setup Environment
-Copy the `.env.example` to `.env` and fill in your API keys:
+### 1. Configure environment
+
 ```bash
 cp .env.example .env
 ```
 
-### 2. Install Dependencies
+Edit `.env` and set your API key and preferred provider:
+
+```env
+# Choose one: openai | google
+DEFAULT_PROVIDER=openai
+DEFAULT_MODEL=gpt-4o-mini
+
+OPENAI_API_KEY=your_key_here   # if using openai
+GEMINI_API_KEY=your_key_here   # if using google
+```
+
+### 2. Install dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Directory Structure
-- `src/tools/`: Extension point for your custom tools.
+## Running the App
 
-## 🏠 Running with Local Models (CPU)
+### Web UI (recommended)
 
-If you don't want to use OpenAI or Gemini, you can run open-source models (like Phi-3) directly on your CPU using `llama-cpp-python`.
+Starts a Flask server with a browser-based chat interface:
 
-### 1. Download the Model
-Download the **Phi-3-mini-4k-instruct-q4.gguf** (approx 2.2GB) from Hugging Face:
-- [Phi-3-mini-4k-instruct-GGUF](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf)
-- Direct Download: [phi-3-mini-4k-instruct-q4.gguf](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf)
+```bash
+python app.py
+```
 
-### 2. Place Model in Project
-Create a `models/` folder in the root and move the downloaded `.gguf` file there.
+Open [http://localhost:5000](http://localhost:5000) in your browser. The UI lets you switch between **Chatbot** and **ReAct Agent** modes and shows the agent's reasoning trace.
 
-### 3. Update `.env`
-Change your `DEFAULT_PROVIDER` and set the path:
+### CLI
+
+Run interactively in the terminal. Set `MODE` in `.env` or pass it inline:
+
+**Baseline chatbot** (no real-time data):
+```bash
+MODE=baseline python main.py
+```
+
+**ReAct agent** (uses football tools):
+```bash
+MODE=react python main.py
+```
+
+**Side-by-side comparison** (runs both on a fixed set of queries):
+```bash
+MODE=compare python main.py
+```
+
+Type `exit` or `quit` to stop the CLI session.
+
+## Project Structure
+
+```
+app.py              # Flask web app entry point
+main.py             # CLI entry point
+src/
+  agent/            # ReAct agent implementation
+  chatbot/          # Baseline chatbot implementation
+  core/             # LLM provider wrappers (OpenAI, Gemini)
+  tools/            # Football data tools used by the agent
+  telemetry/        # JSON structured logging
+  database.py       # SQLite conversation storage
+static/             # Frontend (HTML/CSS/JS)
+logs/               # Per-day JSON logs
+```
+
+## Using a Local Model (CPU)
+
+To run without an API key using a local GGUF model:
+
+1. Download [Phi-3-mini-4k-instruct-q4.gguf](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf) (~2.2 GB)
+2. Place it in a `models/` folder at the project root
+3. Update `.env`:
+
 ```env
 DEFAULT_PROVIDER=local
 LOCAL_MODEL_PATH=./models/Phi-3-mini-4k-instruct-q4.gguf
 ```
 
-## 🎯 Lab Objectives
-
-1.  **Baseline Chatbot**: Observe the limitations of a standard LLM when faced with multi-step reasoning.
-2.  **ReAct Loop**: Implement the `Thought-Action-Observation` cycle in `src/agent/agent.py`.
-3.  **Provider Switching**: Swap between OpenAI and Gemini seamlessly using the `LLMProvider` interface.
-4.  **Failure Analysis**: Use the structured logs in `logs/` to identify why the agent fails (hallucinations, parsing errors).
-5.  **Grading & Bonus**: Follow the [SCORING.md](file:///Users/tindt/personal/ai-thuc-chien/day03-lab-agent/SCORING.md) to maximize your points and explore bonus metrics.
-
-## 🛠️ How to Use This Baseline
-The code is designed as a **Production Prototype**. It includes:
-- **Telemetry**: Every action is logged in JSON format for later analysis.
-- **Robust Provider Pattern**: Easily extendable to any LLM API.
-- **Clean Skeletons**: Focus on the logic that matters—the agent's reasoning process.
-
----
-
-*Happy Coding! Let's build agents that actually work.*
+> Note: The web app (`app.py`) does not support the `local` provider. Use `main.py` for local model inference.
