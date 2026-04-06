@@ -37,12 +37,32 @@ const DOM = {
 
 // ─── Init ─────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
+    initTheme();
     await loadModelInfo();
     await loadSuggestions();
     await loadConversations();
     renderSuggestionsGrid();
 });
 
+// ─── Theme ────────────────────────────────────────────────────────────
+function initTheme() {
+    const saved = localStorage.getItem('theme') || 'dark';
+    const btn = $('#theme-toggle');
+    if (saved === 'light') {
+        document.documentElement.classList.add('light-mode');
+        if (btn) btn.textContent = '🌙';
+    } else {
+        if (btn) btn.textContent = '☀️';
+    }
+}
+
+function toggleTheme() {
+    const root = document.documentElement;
+    const isLight = root.classList.toggle('light-mode');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    const btn = $('#theme-toggle');
+    if (btn) btn.textContent = isLight ? '🌙' : '☀️';
+}
 
 // ─── API Helpers ──────────────────────────────────────────────────────
 async function api(url, options = {}) {

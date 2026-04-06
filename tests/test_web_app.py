@@ -326,6 +326,28 @@ class TestFollowUpQuestions:
 class TestOutOfDomain:
     """Test that out-of-domain questions are handled gracefully."""
 
+    def test_non_football_question_generic(self, app_client, monkeypatch):
+        """Asking a non-football question should return a graceful response."""
+        mock_llm = MockLLMProvider()
+        monkeypatch.setattr("app.get_llm", lambda: mock_llm)
+        monkeypatch.setattr("app.llm", mock_llm)
+        monkeypatch.setattr("app.chatbot_instance", None)
+
+        resp = app_client.post('/api/conversations', json={"mode": "chatbot"})
+        conv_id = resp.get_json()["conversation"]["id"]
+
+        resp = app_client.post('/api/chat', json={
+            "conversation_id": conv_id,
+            "message": "Can you explain quantum computing in simple terms?",
+            "mode": "chatbot"
+        })
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert "reply" in data
+        assert len(data["reply"]) > 0
+        assert "football" in data["reply"].lower()
+        assert data["reasoning_trace"] is None
+
     def test_weather_question(self, app_client, monkeypatch):
         """TC3: Asking about weather should get a polite response, not crash."""
         mock_llm = MockLLMProvider()
