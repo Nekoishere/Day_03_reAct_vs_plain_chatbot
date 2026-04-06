@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Football Statistics Agent & Chatbot — AI-powered football assistant with real-time data and ReAct reasoning">
+    <title>⚽ Football Statistics Agent & Chatbot</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+<div class="app-container">
+    <!-- ─── Sidebar ─────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="logo-icon">⚽</div>
+                <h1>
+                    Football AI
+                    <span>Statistics & Score Agent</span>
+                </h1>
+            </div>
+            <button class="btn-new-chat" id="btn-new-chat" onclick="createNewConversation()">
+                <span>＋</span> New Conversation
+            </button>
+        </div>
+
+        <div class="conversation-list" id="conversation-list">
+            <div class="conversation-list-empty" id="conv-list-empty">
+                No conversations yet.<br>Start a new chat to begin!
+            </div>
+        </div>
+    </aside>
+
+    <!-- Sidebar mobile overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- ─── Main Content ────────────────────────────────────────── -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="btn-sidebar-toggle" id="btn-sidebar-toggle" onclick="toggleSidebar()">☰</button>
+                <div class="model-badge" id="model-badge">
+                    <div class="status-dot"></div>
+                    <span class="model-name" id="model-name">Loading...</span>
+                    <span class="provider-label" id="provider-label"></span>
+                </div>
+            </div>
+
+            <div class="mode-tabs" id="mode-tabs">
+                <button class="mode-tab active" data-mode="chatbot" onclick="switchMode('chatbot')">
+                    <span class="tab-icon">💬</span>Chatbot
+                </button>
+                <button class="mode-tab" data-mode="agent" onclick="switchMode('agent')">
+                    <span class="tab-icon">🤖</span>Agent
+                </button>
+            </div>
+        </header>
+
+        <!-- Chat Area -->
+        <div class="chat-area" id="chat-area">
+            <!-- Empty state (shown when no conversation selected) -->
+            <div class="chat-empty-state" id="empty-state">
+                <div class="empty-icon">⚽</div>
+                <h2>Football Statistics Assistant</h2>
+                <p>Ask me anything about football — live scores, player stats, league standings, team form, and more!</p>
+
+                <div class="suggestions-grid" id="suggestions-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Messages container -->
+            <div id="messages-container">
+                <!-- Messages rendered by JS -->
+            </div>
+
+            <!-- Loading indicator -->
+            <div class="loading-message hidden" id="loading-indicator">
+                <div class="avatar">🤖</div>
+                <div>
+                    <div class="loading-dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                    <div class="loading-status-text" id="loading-status-text">Thinking...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <div class="input-suggestions" id="input-suggestions">
+                <!-- Quick suggestion chips populated by JS -->
+            </div>
+            <div class="input-wrapper">
+                <textarea
+                    id="message-input"
+                    placeholder="Ask about football scores, stats, teams..."
+                    rows="1"
+                    onkeydown="handleInputKeydown(event)"
+                    oninput="autoResizeTextarea(this)"
+                    onfocus="showInputSuggestions()"
+                    onblur="hideInputSuggestions()"
+                ></textarea>
+                <button class="btn-clear" id="btn-clear" onclick="clearConversation()" title="Clear conversation">
+                    🗑
+                </button>
+                <button class="btn-send" id="btn-send" onclick="sendMessage()" title="Send message">
+                    ➤
+                </button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
