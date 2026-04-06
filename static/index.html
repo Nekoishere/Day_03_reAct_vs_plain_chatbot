@@ -48,12 +48,17 @@
                 </div>
             </div>
 
-            <div class="mode-tabs" id="mode-tabs">
-                <button class="mode-tab active" data-mode="chatbot" onclick="switchMode('chatbot')">
-                    <span class="tab-icon">💬</span>Chatbot
-                </button>
-                <button class="mode-tab" data-mode="agent" onclick="switchMode('agent')">
-                    <span class="tab-icon">🤖</span>Agent
+            <div class="header-right" style="display: flex; align-items: center; gap: 12px;">
+                <div class="mode-tabs" id="mode-tabs">
+                    <button class="mode-tab active" data-mode="chatbot" onclick="switchMode('chatbot')">
+                        <span class="tab-icon">💬</span>Chatbot
+                    </button>
+                    <button class="mode-tab" data-mode="agent" onclick="switchMode('agent')">
+                        <span class="tab-icon">🤖</span>Agent
+                    </button>
+                </div>
+                <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle Theme" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 12px; cursor: pointer; color: var(--text-primary); transition: var(--transition);">
+                    ☀️
                 </button>
             </div>
         </header>
