@@ -10,7 +10,7 @@
 
 *Describe your specific contribution to the codebase (e.g., implemented a specific tool, fixed the parser, etc.).*
 
-- **Modules Implementated**: `src/api/api.py`, `src/core/openai_provider.py`
+- **Modules Implementated**: `src/api/api.py`, `src/core/openai_provider.py`, `trace.md`, 
 - **Code Highlights**: 
     - Triển khai **FastAPI Server** để bọc Agent/Chatbot thành một REST API chuyên nghiệp.
     - Thiết lập cơ chế **Auto-Fallback** giữa OpenAI và Gemini trong `openai_provider.py`: Nếu OpenAI bị Rate Limit (429), hệ thống tự động đổi sang dùng Gemini để không ngắt quãng trải nghiệm người dùng.
