@@ -16,7 +16,7 @@ def _web_search(query: str) -> str:
         response = _get_client().responses.create(
             model="gpt-4o",
             tools=[{"type": "web_search_preview"}],
-            input=query,
+            input=f"{query} (search the web for the latest up-to-date information, do not rely on training data)",
         )
         return response.output_text
     except Exception as e:
@@ -130,6 +130,16 @@ def get_match_result(team1: str, team2: str, date: str) -> str:
     Args: team1 (e.g. Manchester United), team2 (e.g. West Ham), date (e.g. 5/12/2025 or December 5 2025)
     """
     return _web_search(f"{team1} vs {team2} result score {date}")
+
+
+def search_football_facts(query: str) -> str:
+    """
+    General-purpose football fact search for any question not covered by other tools.
+    Use this for historical records, tournament winners, player biographies,
+    national team results, or any football question outside of club leagues.
+    Arg: query (e.g. 'How many times has Vietnam won the AFF Cup')
+    """
+    return _web_search(query)
 
 
 # ===========================================================================
@@ -300,6 +310,23 @@ FOOTBALL_TOOLS = [
                 "date":  {"type": "string", "description": "Match date, e.g. 5/12/2025 or December 5 2025"},
             },
             "required": ["team1", "team2", "date"],
+        },
+    },
+    {
+        "name": "search_football_facts",
+        "description": (
+            "General-purpose football fact search. Use this for any question not covered by other tools: "
+            "tournament winners, historical records, national team results, player biographies, "
+            "or any football question outside of club league data."
+        ),
+        "func": search_football_facts,
+        "args_schema": ["query"],
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string", "description": "The full football question to search, e.g. 'How many times has Vietnam won the AFF Cup'"},
+            },
+            "required": ["query"],
         },
     },
 ]
