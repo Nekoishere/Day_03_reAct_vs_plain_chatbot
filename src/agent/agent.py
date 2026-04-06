@@ -29,6 +29,8 @@ class ReActAgent:
         ]
         # Build a lookup map for fast tool execution
         self._tool_map = {t["name"]: t["func"] for t in tools}
+        # Persistent conversation history across turns (excluding system message)
+        self.history: List[Dict[str, Any]] = []
 
     def _get_system_prompt(self) -> str:
         today = date.today()
@@ -43,10 +45,15 @@ class ReActAgent:
     def run(self, user_input: str) -> str:
         logger.log_event("AGENT_START", {"input": user_input, "model": self.llm.model_name})
 
-        messages = [
-            {"role": "system", "content": self._get_system_prompt()},
-            {"role": "user",   "content": user_input},
-        ]
+        # Rebuild messages: system prompt (fresh date each call) + history + new user turn
+        new_user_msg = {"role": "user", "content": user_input}
+        messages = (
+            [{"role": "system", "content": self._get_system_prompt()}]
+            + self.history
+            + [new_user_msg]
+        )
+        # Track only messages added this turn for history persistence
+        turn_messages: List[Dict[str, Any]] = [new_user_msg]
 
         total_usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
         steps = 0
@@ -68,6 +75,9 @@ class ReActAgent:
 
             # --- No tool calls → final answer ---
             if not tool_calls:
+                final_msg = {"role": "assistant", "content": content}
+                turn_messages.append(final_msg)
+                self.history.extend(turn_messages)
                 logger.log_event("AGENT_END", {
                     "steps": steps + 1,
                     "answer": content,
@@ -85,6 +95,7 @@ class ReActAgent:
 
             # Append the assistant message (contains tool_calls)
             messages.append(result["message"])
+            turn_messages.append(result["message"])
 
             for tc in tool_calls:
                 tool_name = tc.function.name
@@ -102,16 +113,23 @@ class ReActAgent:
                 })
 
                 # Append tool result message
-                messages.append({
+                tool_msg = {
                     "role":         "tool",
                     "tool_call_id": tc.id,
                     "content":      observation,
-                })
+                }
+                messages.append(tool_msg)
+                turn_messages.append(tool_msg)
 
             steps += 1
 
         logger.log_event("AGENT_END", {"steps": steps, "reason": "max_steps_reached"})
+        # Still save what we have so context isn't lost
+        self.history.extend(turn_messages)
         return "I ran out of steps to answer your question. Please try rephrasing."
+
+    def reset(self):
+        self.history = []
 
     def _execute_tool(self, tool_name: str, kwargs: Dict[str, Any]) -> str:
         func = self._tool_map.get(tool_name)
