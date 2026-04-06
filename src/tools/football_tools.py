@@ -32,6 +32,14 @@ def get_live_scores() -> str:
     return _web_search("football live scores right now today all leagues")
 
 
+def get_live_match_score(team1: str, team2: str) -> str:
+    """
+    Get the live score of a specific ongoing match between two teams.
+    Args: team1 (e.g. Arsenal), team2 (e.g. Chelsea)
+    """
+    return _web_search(f"{team1} vs {team2} live score right now today")
+
+
 def get_league_scores(league_name: str) -> str:
     """
     Get today's scores for a specific league.
@@ -157,6 +165,20 @@ FOOTBALL_TOOLS = [
             "type": "object",
             "properties": {},
             "required": [],
+        },
+    },
+    {
+        "name": "get_live_match_score",
+        "description": "Get the live score of a specific ongoing match between two teams.",
+        "func": get_live_match_score,
+        "args_schema": ["team1", "team2"],
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "team1": {"type": "string", "description": "First team name, e.g. Arsenal"},
+                "team2": {"type": "string", "description": "Second team name, e.g. Chelsea"},
+            },
+            "required": ["team1", "team2"],
         },
     },
     {
