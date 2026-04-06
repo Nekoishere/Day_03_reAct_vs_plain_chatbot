@@ -1,4 +1,5 @@
 from typing import List, Dict, Any
+from src.tools.web_research import web_search_wikipedia, web_page_summary
 
 
 FOOTBALL_EVENTS = [
@@ -80,7 +81,28 @@ def team_major_titles(team_name: str) -> str:
     return f"{team_name} titles in local dataset -> " + ", ".join(parts)
 
 
-def get_football_tools() -> List[Dict[str, Any]]:
+def research_football_facts(query: str) -> str:
+    """
+    Hybrid research helper:
+    - Pulls web snippets from Wikipedia search
+    - Adds local dataset matches as fallback/context
+    """
+    q = (query or "").strip()
+    if not q:
+        return "Please provide a football question."
+
+    web_result = web_search_wikipedia(q)
+    local_result = search_football_history(q)
+
+    return (
+        "Web research:\n"
+        f"{web_result}\n\n"
+        "Local dataset matches:\n"
+        f"{local_result}"
+    )
+
+
+def get_local_football_tools() -> List[Dict[str, Any]]:
     return [
         {
             "name": "search_football_history",
@@ -98,3 +120,34 @@ def get_football_tools() -> List[Dict[str, Any]]:
             "func": team_major_titles,
         },
     ]
+
+
+def get_web_football_tools() -> List[Dict[str, Any]]:
+    return [
+        {
+            "name": "research_football_facts",
+            "description": "Hybrid research for football facts using web search and local dataset context.",
+            "func": research_football_facts,
+        },
+        {
+            "name": "web_search_wikipedia",
+            "description": "Search football information from Wikipedia web endpoint. Input is a query.",
+            "func": web_search_wikipedia,
+        },
+        {
+            "name": "web_page_summary",
+            "description": "Get Wikipedia page summary by title. Input is a page title.",
+            "func": web_page_summary,
+        },
+    ]
+
+
+def get_football_tools(tool_mode: str = "hybrid") -> List[Dict[str, Any]]:
+    mode = (tool_mode or "hybrid").lower()
+    if mode == "offline":
+        return get_local_football_tools()
+    if mode == "web":
+        return get_web_football_tools()
+    if mode == "hybrid":
+        return get_web_football_tools() + get_local_football_tools()
+    raise ValueError("Unsupported tool_mode. Use: offline | web | hybrid")

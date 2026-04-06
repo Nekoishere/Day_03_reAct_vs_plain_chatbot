@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Football Agent UI</title>
+    <style>
+      :root {
+        --bg: #f6f8fb;
+        --card: #ffffff;
+        --text: #1d2433;
+        --accent: #0a6cff;
+        --border: #dbe2ef;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(180deg, #f7fbff 0%, var(--bg) 100%);
+        color: var(--text);
+      }
+      .wrap {
+        max-width: 1040px;
+        margin: 24px auto;
+        padding: 0 16px 24px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 8px 0;
+      }
+      .muted {
+        color: #51627c;
+        margin: 0;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+      label {
+        display: block;
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+      input,
+      select,
+      textarea {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 14px;
+        background: #fff;
+      }
+      textarea {
+        min-height: 140px;
+        resize: vertical;
+      }
+      button {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+      }
+      .row {
+        margin-top: 12px;
+      }
+      pre {
+        margin: 0;
+        padding: 12px;
+        background: #0f172a;
+        color: #d6e1ff;
+        border-radius: 10px;
+        overflow: auto;
+        max-height: 420px;
+      }
+      .status {
+        margin-top: 10px;
+        font-size: 14px;
+      }
+      @media (max-width: 860px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <h1>Football Agent Benchmark UI</h1>
+        <p class="muted">Run baseline vs ReAct locally in browser (API-based).</p>
+      </div>
+
+      <div class="card">
+        <div class="grid">
+          <div>
+            <label for="provider">Provider</label>
+            <select id="provider">
+              <option value="openai">openai</option>
+              <option value="google">google</option>
+              <option value="local">local</option>
+            </select>
+          </div>
+          <div>
+            <label for="model">Model</label>
+            <input id="model" value="{{ default_model }}" />
+          </div>
+          <div>
+            <label for="mode">Mode</label>
+            <select id="mode">
+              <option value="both">both</option>
+              <option value="baseline">baseline</option>
+              <option value="react">react</option>
+            </select>
+          </div>
+          <div>
+            <label for="tool_mode">Tool mode (for ReAct)</label>
+            <select id="tool_mode">
+              <option value="hybrid">hybrid</option>
+              <option value="web">web</option>
+              <option value="offline">offline</option>
+            </select>
+          </div>
+          <div>
+            <label for="run_tag">Run tag</label>
+            <input id="run_tag" value="ui_run" />
+          </div>
+          <div>
+            <label for="react_max_steps">ReAct max steps</label>
+            <input id="react_max_steps" type="number" value="5" min="1" max="20" />
+          </div>
+        </div>
+        <div class="row">
+          <label for="questions">Questions (one per line, leave empty to use default dataset)</label>
+          <textarea id="questions" placeholder="Ai vo dich World Cup 2018 va ti so chung ket la bao nhieu?&#10;Nha vo dich Euro 2016 la ai?"></textarea>
+        </div>
+        <div class="row">
+          <button id="runBtn">Run</button>
+          <span class="status" id="status"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top: 0">Result JSON</h3>
+        <pre id="output">{}</pre>
+      </div>
+    </div>
+
+    <script>
+      const providerEl = document.getElementById("provider");
+      const modelEl = document.getElementById("model");
+      const modeEl = document.getElementById("mode");
+      const toolModeEl = document.getElementById("tool_mode");
+      const runTagEl = document.getElementById("run_tag");
+      const reactMaxStepsEl = document.getElementById("react_max_steps");
+      const questionsEl = document.getElementById("questions");
+      const outputEl = document.getElementById("output");
+      const statusEl = document.getElementById("status");
+      const runBtn = document.getElementById("runBtn");
+
+      providerEl.value = "{{ default_provider }}";
+
+      async function runBenchmark() {
+        runBtn.disabled = true;
+        statusEl.textContent = "Running...";
+        outputEl.textContent = "{}";
+
+        try {
+          const payload = {
+            provider: providerEl.value,
+            model: modelEl.value.trim(),
+            mode: modeEl.value,
+            tool_mode: toolModeEl.value,
+            run_tag: runTagEl.value.trim() || "ui_run",
+            react_max_steps: parseInt(reactMaxStepsEl.value || "5", 10),
+            questions: questionsEl.value,
+          };
+
+          const res = await fetch("/api/run", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json();
+          outputEl.textContent = JSON.stringify(data, null, 2);
+          statusEl.textContent = data.ok ? "Done." : "Failed.";
+        } catch (err) {
+          outputEl.textContent = JSON.stringify({ ok: false, error: String(err) }, null, 2);
+          statusEl.textContent = "Failed.";
+        } finally {
+          runBtn.disabled = false;
+        }
+      }
+
+      runBtn.addEventListener("click", runBenchmark);
+    </script>
+  </body>
+</html>

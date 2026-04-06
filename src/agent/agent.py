@@ -10,10 +10,17 @@ class ReActAgent:
     Students should implement the core loop logic and tool execution.
     """
     
-    def __init__(self, llm: LLMProvider, tools: List[Dict[str, Any]], max_steps: int = 5):
+    def __init__(
+        self,
+        llm: LLMProvider,
+        tools: List[Dict[str, Any]],
+        max_steps: int = 5,
+        metric_scenario: str = "react",
+    ):
         self.llm = llm
         self.tools = tools
         self.max_steps = max_steps
+        self.metric_scenario = metric_scenario
         self.history = []
 
     def get_system_prompt(self) -> str:
@@ -58,7 +65,7 @@ class ReActAgent:
                 model=self.llm.model_name,
                 usage=result.get("usage", {}),
                 latency_ms=result.get("latency_ms", 0),
-                scenario="react",
+                scenario=self.metric_scenario,
             )
 
             logger.log_event(
@@ -132,4 +139,3 @@ class ReActAgent:
                     logger.log_event("TOOL_EXECUTION_ERROR", {"tool": tool_name, "error": str(exc)})
                     return f"Tool {tool_name} failed: {exc}"
         return f"Tool {tool_name} not found."
-addđ

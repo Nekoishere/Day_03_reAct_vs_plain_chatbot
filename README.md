@@ -1,85 +1,73 @@
-# Lab 3: Chatbot vs ReAct Agent (Industry Edition)
+# Lab 3: Chatbot vs ReAct Agent (API First)
 
-Welcome to Phase 3 of the Agentic AI course! This lab focuses on moving from a simple LLM Chatbot to a sophisticated **ReAct Agent** with industry-standard monitoring.
+This branch is refactored to benchmark `baseline chatbot` vs `ReAct agent` with OpenAI/Gemini by default.
 
-## 🚀 Getting Started
+## Quick start
 
-### 1. Setup Environment
-Copy the `.env.example` to `.env` and fill in your API keys:
-```bash
-cp .env.example .env
-```
-
-### 2. Install Dependencies
+1. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Directory Structure
-- `src/tools/`: Extension point for your custom tools.
-
-## 📊 Benchmark Baseline vs ReAct (Football History)
-
-Project đã có script benchmark để so sánh metric giữa `baseline chatbot` và `ReAct agent` cho chủ đề lịch sử bóng đá.
-
+2. Prepare env:
 ```bash
-python -m src.benchmark_football --provider openai --model gpt-4o
+cp .env.example .env
 ```
 
-Hoặc chạy local model:
-
-```bash
-python -m src.benchmark_football --provider local --model local
-```
-
-Lưu báo cáo vào thư mục tùy chọn:
-```bash
-python -m src.benchmark_football --provider openai --model gpt-4o --output-dir report/benchmark_runs
-```
-
-Kết quả in ra gồm:
-- `avg_keyword_score` (độ chính xác theo bộ từ khóa kỳ vọng)
-- `total_tokens`, `avg_latency_ms`, `total_cost_estimate`
-- `avg_steps` của ReAct (số vòng Thought-Action-Observation)
-- Report tự động:
-  - `football_benchmark_<provider>_<timestamp>.json`
-  - `football_benchmark_<provider>_<timestamp>.md`
-
-Roadmap chi tiết: `PROJECT_ROADMAP.md`
-
-## 🏠 Running with Local Models (CPU)
-
-If you don't want to use OpenAI or Gemini, you can run open-source models (like Phi-3) directly on your CPU using `llama-cpp-python`.
-
-### 1. Download the Model
-Download the **Phi-3-mini-4k-instruct-q4.gguf** (approx 2.2GB) from Hugging Face:
-- [Phi-3-mini-4k-instruct-GGUF](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf)
-- Direct Download: [phi-3-mini-4k-instruct-q4.gguf](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf)
-
-### 2. Place Model in Project
-Create a `models/` folder in the root and move the downloaded `.gguf` file there.
-
-### 3. Update `.env`
-Change your `DEFAULT_PROVIDER` and set the path:
+3. Put API key in `.env`:
 ```env
-DEFAULT_PROVIDER=local
-LOCAL_MODEL_PATH=./models/Phi-3-mini-4k-instruct-q4.gguf
+DEFAULT_PROVIDER=openai
+DEFAULT_MODEL=gpt-4o
+OPENAI_API_KEY=your_key_here
 ```
 
-## 🎯 Lab Objectives
+4. Run benchmark:
+```bash
+python -m src.benchmark_football --mode both --provider openai --model gpt-4o --tool-mode hybrid
+```
 
-1.  **Baseline Chatbot**: Observe the limitations of a standard LLM when faced with multi-step reasoning.
-2.  **ReAct Loop**: Implement the `Thought-Action-Observation` cycle in `src/agent/agent.py`.
-3.  **Provider Switching**: Swap between OpenAI and Gemini seamlessly using the `LLMProvider` interface.
-4.  **Failure Analysis**: Use the structured logs in `logs/` to identify why the agent fails (hallucinations, parsing errors).
-5.  **Grading & Bonus**: Follow `SCORING.md` to maximize your points and explore bonus metrics.
+Or use the wrapper script:
+```bash
+./scripts/run_benchmark.sh --mode both --tool-mode hybrid
+```
 
-## 🛠️ How to Use This Baseline
-The code is designed as a **Production Prototype**. It includes:
-- **Telemetry**: Every action is logged in JSON format for later analysis.
-- **Robust Provider Pattern**: Easily extendable to any LLM API.
-- **Clean Skeletons**: Focus on the logic that matters—the agent's reasoning process.
+Script help:
+```bash
+./scripts/run_benchmark.sh --help-script
+```
 
----
+5. Check output:
+- Terminal summary
+- `report/benchmark_runs/*.json`
+- `report/benchmark_runs/*.md`
 
-*Happy Coding! Let's build agents that actually work.*
+## Local Web UI
+
+Start UI:
+```bash
+./scripts/run_ui.sh
+```
+
+Open browser:
+```text
+http://127.0.0.1:7860
+```
+
+In the UI you can:
+- select provider/model/mode/tool-mode
+- enter football questions (one per line)
+- run and view structured JSON result directly
+
+## Full guide
+
+Please use [API_RUNBOOK.md](./API_RUNBOOK.md) for:
+- full workflow
+- dataset input modes (UI/file/CLI)
+- version flags for debug
+- tool mode (`offline` / `web` / `hybrid`)
+- troubleshooting
+
+## Notes
+
+- Local model (`provider=local`) is optional and not required for normal benchmark flow.
+- The recommended flow for this lab is OpenAI/Gemini with API key.
