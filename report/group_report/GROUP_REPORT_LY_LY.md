@@ -12,7 +12,7 @@ This project compares a baseline football chatbot against a ReAct agent that can
 The evaluation focuses on answer quality, tool-use correctness, context retention, and graceful handling of out-of-domain questions.
 
 - **Success Rate**: Chatbot 4/5, Agent 5/5 (on 5 core test cases)
-- **Key Outcome**: The agent outperformed the chatbot on real-time and multi-step tasks by grounding responses in tool observations and preserving reasoning trace.
+- **Key Outcome**: The agent outperformed the chatbot on real-time and multi-step tasks by grounding responses in tool observations and preserving reasoning trace; however, this comparison is not fully symmetric because the baseline chatbot is limited by training cutoff while the agent can access fresh tool data.
 
 ---
 
@@ -88,11 +88,14 @@ Deep dive into why the agent failed.
 - **Result**: Invalid tool-call/early-finalization issues reduced by ~25%; multi-step consistency improved.
 
 ### Experiment 2 (Bonus): Chatbot vs Agent
+**Fairness note**: Baseline chatbot answers only from pretrained knowledge (time-limited), while the agent can query real-time tools.  
+Therefore, "winner" for live-data tasks should be interpreted as capability difference (static model vs tool-augmented system), not purely model quality.
+
 | Case | Chatbot Result | Agent Result | Winner |
 | :--- | :--- | :--- | :--- |
 | TC1 - Simple Q | Correct | Correct | Draw |
 | TC2 - Multi-step | Generic / incomplete reasoning | Correct, tool-grounded | **Agent** |
-| TC3 - Real-time | Correct refusal (no live access) | Correct live data via tools | **Agent** |
+| TC3 - Real-time | Correctly refuses due to no live access | Correct live data via tools | **Agent** (tool advantage) |
 | TC4 - Out-of-domain | Graceful redirect | Graceful redirect | Draw |
 | TC5 - Follow-up context | Lost context | Correct context retention | **Agent** |
 
